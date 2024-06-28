@@ -1,0 +1,76 @@
+Approaches -->
+Their are two approches we can follow 
+
+1. Use one model approach :
+	1.1 This would more complex model architecture that combines functionalities for both image analysis and HTML generation
+	1.2 The model will be trained on data pairs consisting of website screenshot images and their html code (as not full html code not available for all website this can lower the accuracy of the model)
+	1.3 The model would learn to simultaneouslt identify elements within the image(like buttons) and translate those elements into appropriate HTML tages. 
+		1.3.1 many people already worked on this but didnt get results expected, and required more computation, as we will give this model data that also extracts the components, features, style of css and text. 
+		1.3.2 as one model is going to extract so many features, i think this is the main reason why these type of model not able to predicts its output correctly, maybe so many features for one model is comfusing our model ** as per my thinking
+
+2. Use Two model approach : 
+	2.1 This approach will use two seprate model for image analysis(identifing the components and their style) and code generation(generating code for the input one model gave)(maybe in the form of gui file or something else we can figure it out).
+	2.2 The first model, an image segmentation model(e.g., a CNN), would analyze the website screenshot and identify different sections or potentially detect specific UI elements like buttons ( we can use open cv to map header footer body of the screenshot/image)
+	2.3 The Second model, can be RNN, would take the output from the first model( eg . a segmentation map or bounding boxes or GUI type files or custom files we can create) and generate the corresponding HTML code based on the identified elements and their layout
+	2.4 We can also train our model in a way that understand (commas means next, and { this type tags will be the next line and stores opening tag in memory so it will not forget to close the closing tag 
+
+
+
+what i think is :
+
+* One model approach requiring only one model for interence, but this model need to remember so many important features before giving the final output which is very difficult, one man army kind of thing is happening, one man can win the war but not everytime,
+* To reach perfection it need to store many features, that clearly not happening, not even existing AI tools were able to do this, these type of approach mostly follow PIX2CODE model by Tony Beltramelli (https://github.com/tonybeltramelli/pix2code/tree/master) , and this model is not even accrurate on unseen data ( in simple word not that much creative)
+* we should give a try to two model apporach 
+
+
+In two model approach :
+* This can be trained much easier than one model approach as we can focus on features individual functionalities, main thing we need to focus is creating data for this will take much time and maintaing connections between two models might be computationally less efficient.
+* As this models will detect features and then provide html from another can be more accurate on unseen data.
+* We need to train our second model like a student going to learn HTML and css.
+* So we need to train this on every tag, predicting next tag can be a good method, but prediction should be done from the input first model will give.
+* two model's basic prototype can be in working stage quicker than one model
+* but if we're comfortable with complex model arch., the one model approach might be feasible, but as one model gets comfuses many times and not that much creative
+
+
+
+TWO MODEL APPROACH : 
+
+we can use OCR and CNN in first model, to detect features and text from OCR (as this focus more on text recognition), but OCR have difficulty in identify buttons type of components, so we can use CNN for this task
+RNN can process sequential data, making them suitable for generating code like HTML. They can learn the structure and order of HTML tags, but they lack the capability to analyze visual features within an image.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+More deatiled (By Gemini) :
+1. Image Segmentation (CNN): Train a Convolutional Neural Network (CNN) to segment the website image. This helps identify different sections (header, footer, content) and potentially detect UI elements like buttons based on their location.
+2.OCR for Text Extraction: Use the OCR model to extract text content from identified elements within the image.
+3.Layout Analysis and RNN for HTML Generation: Combine the segmentation results (element locations) with the extracted text. Utilize an RNN to analyze this combined data and generate the corresponding HTML code based on the layout and textual information.
+
+Benefits of this Approach:
+
+* Leverages Strengths (Eye+Brain seperatly working) : Combines the power of image analysis (CNN), text recognition (OCR), and code generation (RNN) for a more robust solution.
+* Improved Accuracy(As i discuss above): By understanding both visual layout and textual content, the model can generate more accurate HTML code.
+* Flexibility (As we not increasing complexity of model) : This approach allows for incorporating additional functionalities as your model evolves.
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Continue Expanation of more details point wise:
+
+1. Image Analysis and Segmentation(CNN):
+	1.1 We can classify each pixel in the image, assigning it a label according to the element (eg. header, button,footer)
+	1.2 Instance Segmentation : Individual instances of elements like buttons, separating them from the backgroung and other elements
+
+2. Leveraging Visual Cues:
+	2.1 Color and Text: we can look for the areas with specific color schemes(eg. gradients, contrasting colors) and text labels suggesting buttons('submit',etc), We can also use OpenCV for identification of colors.
+	2.2 Shape and Size : we can identify the size of the features by using Opencv, and that can be our one more advantage to increace accuracy
+
+3. Data Labeling : 
+	3.1 This will play important role in increasing accuracy, in data preparation, highlighting buttons locations within the website screenshots
+	3.2 Annotate bounding boxes around individual buttons in your training data. This provides more granular information for the model to learn
+
+4. (By Gemini) Leveraging Accessibility Standards (if applicable):
+	4.1 If your training data includes the corresponding HTML code, the model can learn to identify accessibility attributes like aria-label or role="button" associated with buttons in the code. This can help confirm button presence within specific image segments.
+
+
+
+***Even if we create this, it still be very difficult to be accurate on unseen data (or on much creative designs)*** 
+
+
